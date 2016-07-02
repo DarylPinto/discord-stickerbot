@@ -1,2 +1,75 @@
 @import _mixins
 @import _reset
+
+body
+	background-color: #dedede
+
+header
+	width: 100%
+	height: 200px
+	background-color: #122b44
+	.container
+		width: 100%
+		max-width: 1200px
+		margin: 0 auto
+		color: white
+		padding-top: 30px
+		padding-bottom: 40px
+		box-sizing: border-box
+		text-align: center
+		h1
+			font-size: 60px
+			text-align: center
+			text-transform: uppercase
+			font-family: 'Roboto', sans-serif
+			margin-bottom: 30px
+		input
+			border-radius: 20px
+			padding: 10px 20px
+			border: 0
+			outline: 0
+			color: gray
+			font-family: 'Roboto', sans-serif
+			text-align: center
+
+main
+	.container
+		width: 1200px
+		max-width: 100%
+		box-shadow: 0 0 10px rgba(0,0,0,0.15)
+		min-height: 100px
+		margin: 0 auto
+		border-radius: 2px
+		margin-top: 20px
+		margin-bottom: 20px
+		background-color: white
+		box-sizing: border-box
+		padding-top: 30px
+	[class^="pure-u"]
+		padding: 30px 30px
+		padding-top: 0
+		box-sizing: border-box
+	.sticker
+		text-align: center
+		box-shadow: 0 0 5px rgba(0,0,0,0.4)
+		border-radius: 5px
+		height: 280px
+		overflow: hidden
+		position: relative
+		img
+			margin-bottom: -3px
+			max-width: 90%
+			max-height: 220px
+		h3
+			padding-top: 20px
+			padding-bottom: 20px
+			text-transform: lowercase
+			font-family: 'Roboto', sans-serif
+			font-size: 20px
+			background-color: #e2e2e2
+			position: absolute
+			bottom: 0
+			width: 100%
+
+.hidden
+	display: none

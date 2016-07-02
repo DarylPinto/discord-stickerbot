@@ -7,6 +7,12 @@ var commandSymbol = ':';
 var triggerMessage;
 var stickers;
 
+//return nickname of sender, if no nickname, return username
+function getAuthorDisplayName(message){
+	return message.channel.server.detailsOf(message.author).nick || message.author.username;
+}
+
+
 function readStickerDB(error, response, body){
 
 	if(error) console.log(error);
@@ -28,12 +34,12 @@ function postSticker(){
 		//Delete the message that triggered the response
 		bot.deleteMessage(message);
 		//Change nickname to match user who posted the message
-		bot.setNickname(message, message.sender.username, function(){
-			//Post sticker
-			bot.sendMessage(message, stickers[stickerKey], function(){
-				//Change nickname back to stickerbot
-				bot.setNickname(message, 'stickerbot');
-			});
+		bot.setNickname(message, getAuthorDisplayName(message), function(){
+				//Post sticker
+				bot.sendMessage(message, stickers[stickerKey], function(){
+					//Change nickname back to stickerbot
+					bot.setNickname(message, 'stickerbot');
+				});
 		});
 	}
 
@@ -56,4 +62,6 @@ bot.on('message', function(message){
 	}
 });
 
-bot.login(credentials.email, credentials.password);
+bot.login(credentials.email, credentials.password, function(){
+	console.log('Logged in!');
+});
