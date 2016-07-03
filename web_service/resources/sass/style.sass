@@ -7,7 +7,7 @@ body
 header
 	width: 100%
 	height: 200px
-	background-color: #122b44
+	background-color: #181d25
 	.container
 		width: 100%
 		max-width: 1200px
@@ -51,7 +51,7 @@ main
 		box-sizing: border-box
 	.sticker
 		text-align: center
-		background-color: #272727
+		background-color: #36393E
 		box-shadow: 0 0 5px rgba(0,0,0,0.4)
 		border-radius: 5px
 		height: 280px
@@ -71,6 +71,45 @@ main
 			position: absolute
 			bottom: 0
 			width: 100%
+
+#open-sticker-dialog-btn
+	background-color: #51a951
+	color: white
+	font-family: 'Roboto', sans-serif
+	border: 0
+	border-radius: 30px
+	padding: 12px 20px
+	margin-left: 10px
+	outline: 0
+	transition: .2s
+	&:hover
+		background-color: #409e40
+	&:active
+		background-color: green
+
+#add-sticker-dialog	
+	width: 90vw
+	max-width: 600px
+	background-color: #51a951
+	border-radius: 10px
+	text-align: center
+	padding: 80px
+	h2
+		font-family: 'Roboto', sans-serif
+		font-size: 40px
+		color: white
+	input
+		display: block
+		width: 50%
+		font-family: 'Roboto', sans-serif
+		border-radius: 30px
+		padding: 10px 20px
+		text-aligN: center
+		margin: 20px auto
+		border: none
+		outline: 0
+	input[type="submit"]
+		width: 150px
 
 .hidden
 	display: none

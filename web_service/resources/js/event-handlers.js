@@ -1,14 +1,32 @@
 //When the page loads
 $(document).ready(function() {
 
+	bindDynamicSearch();
+	displayStickers();
 
+	$('#open-sticker-dialog-btn').click(function(){
 
-});
+		liteModal.open('#add-sticker-dialog');
 
-//When the window is Resized
-$(window).resize(function() {
-});
+		$('#add-sticker-dialog input:first-of-type').focus();
 
-//When the page scrolls
-$(window).scroll(function() {
+	});
+
+	$('#submit-sticker').submit(function(){	
+
+		$.ajax({
+			type: "POST",
+			url: "add-sticker.php",
+			data: $('#submit-sticker').serialize(),
+			success: function(data){
+				console.log(data);
+				$('main .container').empty();
+				displayStickers();
+				liteModal.close();
+				$('#submit-sticker input[type="text"]').val('');
+			}
+		});
+		return false;
+
+	});
 });
