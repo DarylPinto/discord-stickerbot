@@ -21,4 +21,17 @@ $.getJSON('stickers.json?nocache=' + (new Date()).getTime(), function(data){
 		$('main .container').prepend(el);
 	});
 
+	$('#sticker-search').on('keyup', function(){
+		var filter = this.value.toLowerCase();
+
+		$('.sticker-wrap h3').each(function(){
+			if( this.textContent.indexOf(filter) === -1 ){
+				$(this).closest('.sticker-wrap').addClass('hidden');
+			}else{
+				$(this).closest('.sticker-wrap').removeClass('hidden');
+			}
+		});
+
+	});
+
 });

@@ -33,14 +33,9 @@ function postSticker(){
 
 		//Delete the message that triggered the response
 		bot.deleteMessage(message);
-		//Change nickname to match user who posted the message
-		bot.setNickname(message, getAuthorDisplayName(message), function(){
-				//Post sticker
-				bot.sendMessage(message, stickers[stickerKey], function(){
-					//Change nickname back to stickerbot
-					bot.setNickname(message, 'stickerbot');
-				});
-		});
+		//Post sticker
+		bot.sendMessage(message, '**' + getAuthorDisplayName(message) + ':** ' + stickers[stickerKey] + ' (via stickerbot)' );
+
 	}
 
 }
@@ -49,7 +44,9 @@ bot.on('message', function(message){
 	//If first and last characters are `commandSymbol`
 	if(message.content[0] === commandSymbol &&
 		 message.content[message.content.length - 1] === commandSymbol ){
-		
+	
+		message.content = message.content.toLowerCase();
+
 		//Save message as global variable for use in another function
 		triggerMessage = message;
 
