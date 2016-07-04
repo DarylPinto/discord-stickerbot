@@ -35,6 +35,7 @@ function postSticker(){
 		bot.deleteMessage(message);
 		//Post sticker
 		bot.sendMessage(message, '**' + getAuthorDisplayName(message) + '** sent a sticker:\n' + stickers[stickerKey]);
+		//bot.reply(message, 'sent a sticker ('+stickerKey+'):\n' + stickers[stickerKey]);
 
 	}
 

@@ -1,32 +1,25 @@
-//When the page loads
-$(document).ready(function() {
+$('#open-sticker-dialog-btn').click(function(){
 
-	bindDynamicSearch();
-	displayStickers();
+	liteModal.open('#add-sticker-dialog');
 
-	$('#open-sticker-dialog-btn').click(function(){
+	$('#add-sticker-dialog input:first-of-type').focus();
 
-		liteModal.open('#add-sticker-dialog');
+});
 
-		$('#add-sticker-dialog input:first-of-type').focus();
+$('#submit-sticker').submit(function(){	
 
+	$.ajax({
+		type: "POST",
+		url: "add-sticker.php",
+		data: $('#submit-sticker').serialize(),
+		success: function(data){
+			console.log(data);
+			$('main .container').empty();
+			displayStickers();
+			liteModal.close();
+			$('#submit-sticker input[type="text"]').val('');
+		}
 	});
+	return false;
 
-	$('#submit-sticker').submit(function(){	
-
-		$.ajax({
-			type: "POST",
-			url: "add-sticker.php",
-			data: $('#submit-sticker').serialize(),
-			success: function(data){
-				console.log(data);
-				$('main .container').empty();
-				displayStickers();
-				liteModal.close();
-				$('#submit-sticker input[type="text"]').val('');
-			}
-		});
-		return false;
-
-	});
 });

@@ -3,9 +3,11 @@ var stickerElements = [];
 
 function storeStickers(key, val){
 
-	stickerElements.push('<div class="pure-u-1 pures-u-md-1-2 pure-u-lg-1-4 sticker-wrap">' +
+	stickerElements.push('<div class="pure-u-1 pure-u-sm-1-2 pure-u-lg-1-4 sticker-wrap">' +
 			'<div class="sticker">' +
-				'<img src="'+val+'">' +
+				'<div class="image-wrap">' +
+					'<img src="'+val+'">' +
+				'</div>' +
 				'<h3>:'+key+':</h3>	' +
 			'</div>' +
 		'</div>'
@@ -33,6 +35,8 @@ function displayStickers(){
 
 		stickerData = data;
 
+		stickerElements = [];
+
 		$.each(data, storeStickers);
 
 		stickerElements.forEach(function(el){
@@ -43,3 +47,6 @@ function displayStickers(){
 
 	});
 }
+
+bindDynamicSearch();
+displayStickers();

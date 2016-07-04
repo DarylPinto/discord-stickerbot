@@ -3,7 +3,7 @@
 <head>
 
 	<title>Discord Stickerbot</title>
-	<meta name="description" content="Bringing the thing we miss most about Telegram to our favorite new chat client.">
+	<meta name="description" content="Ontario Online Smash Discord stickers! View the catalog or add your own.">
 	<meta charset="utf-8">
 	
 	<meta name="theme-color" content="">
@@ -31,10 +31,8 @@
 	<!-- jQuery :: jquery.com -->
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
 
-	<!-- Concatenated and Minified JS -->
+	<!-- Modal Script -->
 	<script type="text/javascript" src="resources/js/lite-modal.min.js"></script>
-	<script type="text/javascript" src="resources/js/main.js"></script>
-	<script type="text/javascript" src="resources/js/event-handlers.js"></script>
 
 </head>
 <body>
@@ -53,14 +51,17 @@
 
 	<div id="add-sticker-dialog" class="lite-modal">
 
-		<form id="submit-sticker">
+		<form id="submit-sticker" autocomplete="off">
 			<h2>Add a sticker</h2>
-			<input type="text" name="stickerName" placeholder="Sticker Name">
-			<input type="text" name="stickerURL" placeholder="Sticker Image URL">
+			<input type="text" name="stickerName" placeholder="Sticker Name" pattern="[a-z0-9]+" title="Lowercase letters and numbers only" required>
+			<input type="text" name="stickerURL" placeholder="Sticker Image URL" pattern=".+(\.jpeg|\.jpg|.png).*" title="Direct image link" required>
 			<input type="submit" name="submit" value="Add" id="submit-sticker-btn">
 		</form>
 
 	</div>
+
+<script type="text/javascript" src="resources/js/main.js"></script>
+<script type="text/javascript" src="resources/js/event-handlers.js"></script>
 
 </body>
 </html>
