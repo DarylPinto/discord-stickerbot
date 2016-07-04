@@ -23,3 +23,19 @@ $('#submit-sticker').submit(function(){
 	return false;
 
 });
+
+//Show warning if sticker name is already taken or is already an emoji
+$('input[name="stickerName"]').blur(function(){
+
+	var name = $(this).val();
+	if( emojiList.indexOf( name ) > -1 || Object.keys(stickerData).indexOf( name ) > -1 ){
+
+		$('.name-taken-warning').removeClass('hidden');
+		$('#submit-sticker-btn').addClass('unclickable');
+
+	}else{
+		$('.name-taken-warning').addClass('hidden');
+		$('#submit-sticker-btn').removeClass('unclickable');
+	}
+
+});

@@ -1,4 +1,5 @@
 var stickerData;
+var emojiList;
 var stickerElements = [];
 
 function storeStickers(key, val){
@@ -48,5 +49,11 @@ function displayStickers(){
 	});
 }
 
+
 bindDynamicSearch();
+
 displayStickers();
+
+$.getJSON('emojis.json', function(data){
+	emojiList = data.emojis;
+});
