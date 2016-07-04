@@ -6,27 +6,21 @@
 	<meta name="description" content="Ontario Online Smash Discord stickers! View the catalog or add your own.">
 	<meta charset="utf-8">
 	
-	<meta name="theme-color" content="">
+	<meta name="theme-color" content="#181d25">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<meta name="og:title" content="Discord Stickerbot">
-	<meta name="og:description" content="Bringing the thing we miss most about Telegram to our favorite new chat client.">
-	<meta name="og:image" content="">
+	<meta name="og:description" content="Ontario Online Smash Discord stickers! View the catalog or add your own.">
 
-	<!-- Pure.css :: purecss.io-->
-	<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
-	<!--[if lte IE 8]>
-	    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-old-ie-min.css">
+	<!--[if lte IE 9]>
+	    <meta http-equiv="Refresh" content="0; url=http://outdatedbrowser.com/en" />
 	<![endif]-->
-	<!--[if gt IE 8]><!-->
-	    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
-	<!--<![endif]-->
 
 	<link rel="stylesheet" type="text/css" href="resources/css/style.css">
 	<link rel="shortcut icon" type="image/ico" href="resources/images/min/favicon.ico" />
 
 	<!--Google Web Fonts-->	
-	<link href="https://fonts.googleapis.com/css?family=Roboto:500" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Roboto:100,500" rel="stylesheet">
 
 	<!-- jQuery :: jquery.com -->
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
@@ -45,11 +39,13 @@
 		</div>
 	</header>
 	<main>
-		<div class="container pure-g">
+		<div class="container">
 		</div>	
 	</main>
 
 	<div id="add-sticker-dialog" class="lite-modal">
+
+		<span class="close-x">X</span>
 
 		<form id="submit-sticker" autocomplete="off">
 			<h2>Add a sticker</h2>
@@ -58,7 +54,7 @@
 			<input type="submit" name="submit" value="Add" id="submit-sticker-btn">
 		</form>
 
-		<p class="name-taken-warning hidden">Alert: That sticker name is already in use.</p>
+		<p class="name-taken-warning hidden">That name is already in use.</p>
 
 	</div>
 

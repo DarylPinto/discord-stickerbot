@@ -39,3 +39,7 @@ $('input[name="stickerName"]').blur(function(){
 	}
 
 });
+
+$('.close-x').click(function(){
+	liteModal.close();	
+});

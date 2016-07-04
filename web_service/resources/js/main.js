@@ -4,13 +4,10 @@ var stickerElements = [];
 
 function storeStickers(key, val){
 
-	stickerElements.push('<div class="pure-u-1 pure-u-sm-1-2 pure-u-lg-1-4 sticker-wrap">' +
-			'<div class="sticker">' +
-				'<div class="image-wrap">' +
-					'<img src="'+val+'">' +
-				'</div>' +
-				'<h3>:'+key+':</h3>	' +
-			'</div>' +
+	stickerElements.push(''+
+		'<div class="sticker">' +
+			'<div class="image-area" style="background-image: url('+val+')"></div>' +
+			'<p>:'+key+':</p>	' +
 		'</div>'
 	);
 
@@ -20,11 +17,11 @@ function bindDynamicSearch(){
 	$('#sticker-search').on('keyup', function(){
 		var filter = this.value.toLowerCase().trim();
 
-		$('.sticker-wrap h3').each(function(){
+		$('.sticker p').each(function(){
 			if( this.textContent.indexOf(filter) === -1 ){
-				$(this).closest('.sticker-wrap').addClass('hidden');
+				$(this).closest('.sticker').addClass('hidden');
 			}else{
-				$(this).closest('.sticker-wrap').removeClass('hidden');
+				$(this).closest('.sticker').removeClass('hidden');
 			}
 		});
 
