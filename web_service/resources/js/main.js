@@ -2,6 +2,7 @@ var stickerData;
 var emojiList;
 var stickerElements = [];
 
+//Store array of HTML strings for each sticker
 function storeStickers(key, val){
 
 	stickerElements.push(''+
@@ -13,6 +14,7 @@ function storeStickers(key, val){
 
 }
 
+//Make input at top of page filter stickers
 function bindDynamicSearch(){
 	$('#sticker-search').on('keyup', function(){
 		var filter = this.value.toLowerCase().trim();
@@ -28,6 +30,7 @@ function bindDynamicSearch(){
 	});
 }
 
+//Show stickers on screen
 function displayStickers(){
 	$.getJSON('stickers.json?nocache=' + (new Date()).getTime(), function(data){
 
@@ -46,11 +49,46 @@ function displayStickers(){
 	});
 }
 
+//Prepare imgur image to be stored in stickers JSON file
+function prepareUploadedImage(img){
+	$('input[name="stickerURL"]').val(img);
+	$('.dropzone').addClass('hidden');
+	$('.status').removeClass('hidden').css('background-image', 'url('+img+')');
+}
+
+//Remove imgur image from dialog window
+function removeUploadedImage(){
+	$('#submit-sticker input[type="text"]').val('');
+	$('.dropzone').removeClass('hidden');
+	$('.status').addClass('hidden');
+}
+
+//Close upload popup window and remove uploaded image (if there is one)
+function closeUploadModal(){
+	liteModal.close();
+	window.setTimeout(function(){
+		removeUploadedImage();
+	}, 400);
+}
 
 bindDynamicSearch();
-
 displayStickers();
 
+//Store emoji array
 $.getJSON('emojis.json', function(data){
 	emojiList = data.emojis;
 });
+
+//imgur.js upload
+new Imgur({
+
+	clientid: '10d33ee9d20ff23',
+	callback: function(result){
+		if(result.success){
+			prepareUploadedImage(result.data.link);
+		}
+	}
+
+});
+
+$('.status').addClass('hidden');

@@ -101,11 +101,12 @@ main
 #add-sticker-dialog	
 	width: 80vw
 	max-width: 640px
-	background-color: #51a951
+	background-color: #36393E
 	border-radius: 10px
 	text-align: center
 	box-sizing: border-box
 	padding: 50px
+	border: 2px solid rgba(255,255,255, 0.3)
 	padding-bottom: 30px
 	.close-x
 		position: absolute
@@ -132,23 +133,56 @@ main
 		font-family: 'Roboto', sans-serif
 		border-radius: 30px
 		padding: 10px 20px
-		text-aligN: center
+		text-align: center
 		margin: 20px auto
 		border: none
 		outline: 0
 	input[type="submit"]
 		width: 150px
 		cursor: pointer
-		background-color: #181d25
+		background-color: #51a951
 		color: white
 		transition: .3s
+		&:hover
+			background-color: #409e40
+		&:active
+			background-color: green
+	.dropzone
+		border: 2px dashed white
+		height: 140px
+		max-width: 65%
+		margin: 0 auto
+		margin-top: 20px
+		overflow: hidden
+		p
+			color: rgba(255,255,255,0.6)
+			font-family: 'Roboto', sans-serif
+			line-height: 140px
+			margin: 0 auto
+			padding-top: 45px
+			line-height: 1.6em
+			max-width: 130px
+		input
+			margin: 0
+			padding: 0
+			width: 100%
+			height: inherit
+			cursor: pointer
+	.status
+		background-size: contain
+		background-repeat: no-repeat
+		background-position: center center
+		max-width: 60%
+		height: 140px
+		margin: 0 auto
+		margin-top: 20px
 
-.name-taken-warning
+.warning
 	color: white
-	font-family: 'Roboto'
+	font-family: 'Roboto', sans-serif
 
 .hidden
-	display: none
+	display: none !important
 
 .unclickable
 	pointer-events: none

@@ -17,7 +17,7 @@ $('#submit-sticker').submit(function(){
 			$('main .container').empty();
 			displayStickers();
 			liteModal.close();
-			$('#submit-sticker input[type="text"]').val('');
+			removeUploadedImage();
 		}
 	});
 	return false;
@@ -30,16 +30,16 @@ $('input[name="stickerName"]').blur(function(){
 	var name = $(this).val();
 	if( emojiList.indexOf( name ) > -1 || Object.keys(stickerData).indexOf( name ) > -1 ){
 
-		$('.name-taken-warning').removeClass('hidden');
+		$('.name-taken').removeClass('hidden');
 		$('#submit-sticker-btn').addClass('unclickable');
 
 	}else{
-		$('.name-taken-warning').addClass('hidden');
+		$('.name-taken').addClass('hidden');
 		$('#submit-sticker-btn').removeClass('unclickable');
 	}
 
 });
 
 $('.close-x').click(function(){
-	liteModal.close();	
+	closeUploadModal();
 });
