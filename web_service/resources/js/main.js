@@ -63,14 +63,6 @@ function removeUploadedImage(){
 	$('.status').addClass('hidden');
 }
 
-//Close upload popup window and remove uploaded image (if there is one)
-function closeUploadModal(){
-	liteModal.close();
-	window.setTimeout(function(){
-		removeUploadedImage();
-	}, 400);
-}
-
 bindDynamicSearch();
 displayStickers();
 

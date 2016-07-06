@@ -1,4 +1,6 @@
 var Discord = require('discord.js');
+var fs = require('fs');
+var fileExists = require('file-exists');
 var request = require('request');
 var credentials = require('./login-info.json');
 
@@ -12,6 +14,14 @@ function getAuthorDisplayName(message){
 	return message.channel.server.detailsOf(message.author).nick || message.author.username;
 }
 
+var download = function(uri, filename, callback){
+  request.head(uri, function(err, res, body){
+    console.log('content-type:', res.headers['content-type']);
+    console.log('content-length:', res.headers['content-length']);
+
+    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+  });
+};
 
 function readStickerDB(error, response, body){
 
@@ -24,6 +34,13 @@ function readStickerDB(error, response, body){
 
 }
 
+function deleteLocalSticker(stickerFile){
+	if( fileExists(sticerFile) ){
+		fs.unlink(stickerFile);
+		console.log('Sticker Deleted\n');
+	}
+}
+
 function postSticker(){
 
 	var message = triggerMessage;
@@ -33,12 +50,25 @@ function postSticker(){
 
 		//Delete the message that triggered the response
 		bot.deleteMessage(message);
-		//Post sticker
-		bot.sendMessage(message, '**' + getAuthorDisplayName(message) + '** sent a sticker:\n' + stickers[stickerKey]);
-		//bot.reply(message, 'sent a sticker ('+stickerKey+'):\n' + stickers[stickerKey]);
+
+		//Downlaod sticker from imgur
+		var stickerFile = stickerKey+'.png';
+
+		download(stickers[stickerKey], stickerFile, function(){
+
+		  console.log('Sticker Downloaded');
+			//Post sticker
+		  bot.sendFile(message, stickerFile, stickerFile, '**'+getAuthorDisplayName(message)+':**', function(){
+		  	if( fileExists(sticerFile) ){
+		  		fs.unlink(stickerFile);
+		  	}
+		  });
+
+		});
+
+		console.log('\n')
 
 	}
-
 }
 
 bot.on('message', function(message){

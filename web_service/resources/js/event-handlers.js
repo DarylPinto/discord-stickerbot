@@ -2,8 +2,6 @@ $('#open-sticker-dialog-btn').click(function(){
 
 	liteModal.open('#add-sticker-dialog');
 
-	$('#add-sticker-dialog input:first-of-type').focus();
-
 });
 
 $('#submit-sticker').submit(function(){	
@@ -41,5 +39,5 @@ $('input[name="stickerName"]').blur(function(){
 });
 
 $('.close-x').click(function(){
-	closeUploadModal();
+	liteModal.close();
 });
