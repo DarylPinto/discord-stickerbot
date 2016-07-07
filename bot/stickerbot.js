@@ -7,12 +7,18 @@ var commandSymbol = ':';
 var triggerMessage;
 var stickers;
 
-//return nickname of sender, if no nickname, return username
+/**
+ * Returns user's display name
+ * @message {Message object} Message sent by user
+ * @returns {string} message author's display name
+ */
 function getAuthorDisplayName(message){
 	return message.channel.server.detailsOf(message.author).nick || message.author.username;
 }
 
-
+/**
+ * Stores sticker data 
+ */
 function readStickerDB(error, response, body){
 
 	if(error) console.log(error);
@@ -24,6 +30,9 @@ function readStickerDB(error, response, body){
 
 }
 
+/**
+ * Sends sticker to discord text channel
+ */
 function postSticker(){
 
 	var message = triggerMessage;
