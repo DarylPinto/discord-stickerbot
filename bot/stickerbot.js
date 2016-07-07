@@ -5,7 +5,6 @@ var credentials = require('./login-info.json');
 
 var bot = new Discord.Client();
 var commandSymbol = ':';
-var mostRecentTriggerMessage;
 
 /**
  * Returns user's display name
