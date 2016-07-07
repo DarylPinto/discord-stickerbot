@@ -66,6 +66,7 @@ function respondTo(triggerMessage){
 	function postSticker(){
 
 		var stickerKey = triggerMessage.content.slice(1, triggerMessage.content.length - 1);
+
 		if(typeof stickers[stickerKey] === 'string'){
 
 			var filepath = 'stickercache/' + stickerKey + '-' + (new Date()).getTime() + '.png';
@@ -77,6 +78,7 @@ function respondTo(triggerMessage){
 			  bot.sendFile(triggerMessage, filepath, filepath, '**' + getAuthorDisplayName(triggerMessage) + ':**', () => fs.unlink(filepath) );
 			});
 		}
+		
 	}
 
 }
