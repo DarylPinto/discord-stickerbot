@@ -1,11 +1,11 @@
 var Discord = require('discord.js');
+var fs = require('fs');
 var request = require('request');
 var credentials = require('./login-info.json');
 
 var bot = new Discord.Client();
 var commandSymbol = ':';
-var triggerMessage;
-var stickers;
+var mostRecentTriggerMessage;
 
 /**
  * Returns user's display name
@@ -17,34 +17,68 @@ function getAuthorDisplayName(message){
 }
 
 /**
- * Stores sticker data 
+ * Downloads an image from a link
+ * @uri {string} direct image link 
+ * @filename {string} filename to save image as
+ * @callback {function} callback function
  */
-function readStickerDB(error, response, body){
+function download(uri, filename, callback){
+  request.head(uri, function(err, res, body){
+    console.log('content-type:', res.headers['content-type']);
+    console.log('content-length:', res.headers['content-length']);
+    console.log('\n');
 
-	if(error) console.log(error);
-	if (!error && response.statusCode === 200){
-		//Store JSON file object
-		stickers = body;
-	}
-	postSticker();
-
-}
+    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+  });
+};
 
 /**
- * Sends sticker to discord text channel
+ * Responds to a message
+ * @triggerMessage {Message object} message that triggered the bot 
  */
-function postSticker(){
+function respondTo(triggerMessage){
 
-	var message = triggerMessage;
+	var stickers;
 
-	var stickerKey = message.content.slice(1, message.content.length - 1);
-	if(typeof stickers[stickerKey] === 'string'){
+	//Check JSON file online for stickers
+	request({
+		url: 'http://darylpinto.com/stickerbot/stickers.json?nocache=' + (new Date()).getTime(),
+		json: true
+	}, readStickerDB);
 
-		//Delete the message that triggered the response
-		bot.deleteMessage(message);
-		//Post sticker
-		bot.sendMessage(message, '**' + getAuthorDisplayName(message) + ':** ' + stickers[stickerKey]);
+	/**
+	 * Store sticker data 
+	 */
+	function readStickerDB(error, response, body){
 
+		if(error) console.log(error);
+		if (!error && response.statusCode === 200){
+			//Store JSON file object
+			stickers = body;
+		}
+		postSticker();
+
+	}
+
+	/**
+	 * Sends sticker to discord text channel
+	 */
+	function postSticker(){
+
+		var stickerKey = triggerMessage.content.slice(1, triggerMessage.content.length - 1);
+
+		if(typeof stickers[stickerKey] === 'string'){
+
+			var filepath = 'stickercache/' + stickerKey + '-' + (new Date()).getTime() + '.png';
+
+			//Delete the message that triggered the response
+			bot.deleteMessage(triggerMessage);
+			//Post sticker
+			download(stickers[stickerKey], filepath, function(){
+			  bot.sendFile(triggerMessage, filepath, filepath, '**' + getAuthorDisplayName(triggerMessage) + ':**', () => fs.unlink(filepath) );
+			});
+		}
+		
 	}
 
 }
@@ -56,18 +90,12 @@ bot.on('message', function(message){
 	
 		message.content = message.content.toLowerCase();
 
-		//Save message as global variable for use in another function
-		triggerMessage = message;
-
-		//Check JSON file online for stickers
-		request({
-			url: 'http://darylpinto.com/stickerbot/stickers.json?nocache=' + (new Date()).getTime(),
-			json: true
-		}, readStickerDB);
-
+		respondTo(message);
+		
 	}
+
 });
 
 bot.login(credentials.email, credentials.password, function(){
-	console.log('Logged in!');
+	console.log('Logged in!\n');
 });

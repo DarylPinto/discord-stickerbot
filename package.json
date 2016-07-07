@@ -14,7 +14,6 @@
   "homepage": "https://github.com/DarylPinto/discord-stickerbot#readme",
   "dependencies": {
     "discord.js": "^8.0.0",
-    "file-exists": "^1.0.0",
     "request": "^2.72.0"
   }
 }
