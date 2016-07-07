@@ -6,6 +6,9 @@
     "type": "git",
     "url": "git+https://github.com/DarylPinto/discord-stickerbot.git"
   },
+  "scripts": {
+    "start": "node ./bot/stickerbot.js"
+  },
   "author": "Daryl Pinto",
   "license": "MIT",
   "bugs": {
