@@ -1,6 +1,8 @@
 var Discord = require('discord.js');
 var fs = require('fs');
 var request = require('request');
+var imagemin = require('imagemin');
+var imageminPngquant = require('imagemin-pngquant');
 var credentials = require('./login-info.json');
 
 var bot = new Discord.Client();
@@ -13,6 +15,16 @@ var commandSymbol = ':';
  */
 function getAuthorDisplayName(message){
 	return message.channel.server.detailsOf(message.author).nick || message.author.username;
+}
+
+
+function fileExists(filename) {
+  try {
+    fs.accessSync(filename);
+    return true;
+  } catch(ex) {
+    return false;
+  }
 }
 
 /**
@@ -55,6 +67,9 @@ function respondTo(triggerMessage){
 			//Store JSON file object
 			stickers = body;
 		}
+
+		prepareSticker(triggerMessage);
+
 		postSticker();
 
 	}
@@ -65,21 +80,34 @@ function respondTo(triggerMessage){
 	function postSticker(){
 
 		var stickerKey = triggerMessage.content.slice(1, triggerMessage.content.length - 1);
+		var filepath = `cache/compressed${stickerKey}.png`;
 
 		if(typeof stickers[stickerKey] === 'string'){
 
-			var filepath = 'stickercache/' + stickerKey + '-' + (new Date()).getTime() + '.png';
-
 			//Delete the message that triggered the response
 			bot.deleteMessage(triggerMessage);
-			//Post sticker
-			download(stickers[stickerKey], filepath, function(){
-			  bot.sendFile(triggerMessage, filepath, filepath, '**' + getAuthorDisplayName(triggerMessage) + ':**', () => fs.unlink(filepath) );
-			});
-		}
-		
-	}
 
+			//Post Sticker
+			if( fileExists(filepath) ){
+
+				bot.sendFile(triggerMessage, filepath, filepath, '**' + getAuthorDisplayName(triggerMessage) + ':**');
+
+			}else{
+
+				download(stickers[stickerKey], filepath, function(){
+					//imagemin([`cache/${stickerKey}.png`], 'cache/compressed', {
+					//	plugins: [imageminPngquant({quality: '40-50'})]
+					//}).then(() => {
+						bot.sendFile(triggerMessage, filepath, filepath, '**' + getAuthorDisplayName(triggerMessage) + ':**');
+					//});
+				});
+
+			}
+			
+			console.log('Sticker Sent!');
+
+		}
+	}
 }
 
 bot.on('message', function(message){
