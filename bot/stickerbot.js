@@ -1,8 +1,7 @@
 var Discord = require('discord.js');
 var fs = require('fs');
+var gm = require('gm');
 var request = require('request');
-var imagemin = require('imagemin');
-var imageminPngquant = require('imagemin-pngquant');
 var credentials = require('./login-info.json');
 
 var bot = new Discord.Client();
@@ -68,8 +67,6 @@ function respondTo(triggerMessage){
 			stickers = body;
 		}
 
-		prepareSticker(triggerMessage);
-
 		postSticker();
 
 	}
@@ -80,27 +77,33 @@ function respondTo(triggerMessage){
 	function postSticker(){
 
 		var stickerKey = triggerMessage.content.slice(1, triggerMessage.content.length - 1);
-		var filepath = `cache/compressed${stickerKey}.png`;
+		var cachePath = `cache/${stickerKey}.png`;
+		var compressedPath = `cache/compressed/${stickerKey}.png`;
 
 		if(typeof stickers[stickerKey] === 'string'){
 
+
+			console.time('Sticker Response Time');
 			//Delete the message that triggered the response
 			bot.deleteMessage(triggerMessage);
 
 			//Post Sticker
-			if( fileExists(filepath) ){
+			if( !fileExists(cachePath) ){
 
-				bot.sendFile(triggerMessage, filepath, filepath, '**' + getAuthorDisplayName(triggerMessage) + ':**');
+				download(stickers[stickerKey], cachePath, function(){
+					
+					gm(cachePath)
+					.resize(350, 350)
+					.noProfile()
+					.write(compressedPath, function (err) {
+					  bot.sendFile(triggerMessage, compressedPath, compressedPath, '**' + getAuthorDisplayName(triggerMessage) + ':**', () => console.timeEnd('Sticker Response Time'));
+					});
+
+				});
 
 			}else{
 
-				download(stickers[stickerKey], filepath, function(){
-					//imagemin([`cache/${stickerKey}.png`], 'cache/compressed', {
-					//	plugins: [imageminPngquant({quality: '40-50'})]
-					//}).then(() => {
-						bot.sendFile(triggerMessage, filepath, filepath, '**' + getAuthorDisplayName(triggerMessage) + ':**');
-					//});
-				});
+				bot.sendFile(triggerMessage, compressedPath, compressedPath, '**' + getAuthorDisplayName(triggerMessage) + ':**', () => console.timeEnd('Sticker Response Time'));
 
 			}
 			

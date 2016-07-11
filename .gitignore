@@ -1,3 +1,4 @@
 node_modules
 bot/login-info.json
-bot/*.png
+bot/cache/*.png
+bot/cache/compressed/*.png
