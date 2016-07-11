@@ -106,9 +106,6 @@ function respondTo(triggerMessage){
 				bot.sendFile(triggerMessage, compressedPath, compressedPath, '**' + getAuthorDisplayName(triggerMessage) + ':**', () => console.timeEnd('Sticker Response Time'));
 
 			}
-			
-			console.log('Sticker Sent!');
-
 		}
 	}
 }
