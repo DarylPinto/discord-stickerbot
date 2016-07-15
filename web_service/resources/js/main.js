@@ -2,6 +2,18 @@ var stickerData;
 var emojiList;
 var stickerElements = [];
 
+//Get value from querystring paramaters
+//stackoverflow.com/q/901115
+function querystringParam(name, url) {
+	if (!url) url = window.location.href;
+	name = name.replace(/[\[\]]/g, "\\$&");
+	var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+		results = regex.exec(url);
+	if (!results) return null;
+	if (!results[2]) return '';
+	return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
 //Store array of HTML strings for each sticker
 function storeStickers(key, val){
 
@@ -84,3 +96,7 @@ new Imgur({
 });
 
 $('.status').addClass('hidden');
+
+if( querystringParam('add') != null ){
+	$('#open-sticker-dialog-btn').removeClass('hidden');
+}
