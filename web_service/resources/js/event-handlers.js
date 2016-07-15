@@ -25,7 +25,7 @@ $('#submit-sticker').submit(function(){
 //Show warning if sticker name is already taken or is already an emoji
 $('input[name="stickerName"]').blur(function(){
 
-	var name = $(this).val();
+	var name = $(this).val().replace(/:/g, '');
 	if( emojiList.indexOf( name ) > -1 || Object.keys(stickerData).indexOf( name ) > -1 ){
 
 		$('.name-taken').removeClass('hidden');
