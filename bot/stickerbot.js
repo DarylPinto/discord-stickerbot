@@ -111,12 +111,12 @@ function respondTo(triggerMessage){
 }
 
 bot.on('message', function(message){
-	//If first and last characters are `commandSymbol`
-	if(message.content[0] === commandSymbol &&
-		 message.content[message.content.length - 1] === commandSymbol ){
+	//For bot to respond, trimmed message must:
+	// - Start and end with :
+	// - Have between 1 and infinite letter/number characters
+	if( /^:[a-z0-9]+:$/.test( message.content.trim() ) ){
 	
 		message.content = message.content.toLowerCase();
-
 		respondTo(message);
 		
 	}

@@ -54,7 +54,7 @@
 			<h2>Add a sticker</h2>
 			<div class="dropzone"></div>
 			<input type="text" name="stickerURL" class="hidden" placeholder="Sticker Image URL" pattern=".+(\.jpeg|\.jpg|.png).*" title="Direct image link" required>
-			<input type="text" name="stickerName" placeholder="Sticker Name" pattern="([a-z0-9]|:)+" title="Lowercase letters and numbers only" required>
+			<input type="text" name="stickerName" placeholder="Sticker Name" pattern="^:?[a-z0-9]+:?$" title="Lowercase letters and numbers only" required>
 			<input type="submit" name="submit" value="Add" id="submit-sticker-btn">
 		</form>
 
