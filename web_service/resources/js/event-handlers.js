@@ -26,13 +26,16 @@ $('#submit-sticker').submit(function(){
 $('input[name="stickerName"]').blur(function(){
 
 	var name = $(this).val().replace(/:/g, '');
-	if( emojiList.indexOf( name ) > -1 || Object.keys(stickerData).indexOf( name ) > -1 ){
 
-		$('.name-taken').removeClass('hidden');
-		$('#submit-sticker-btn').addClass('unclickable');
+	$('#submit-sticker-btn').addClass('unclickable');
+	$('.warning').addClass('hidden');
 
+	if(Object.keys(stickerData).indexOf( name ) > -1 ){
+		$('#nametaken-sticker').removeClass('hidden');
+	}else if(emojiList.indexOf( name ) > -1){
+		$('#nametaken-emoji').removeClass('hidden');
 	}else{
-		$('.name-taken').addClass('hidden');
+		$('#nametaken-sticker, #nametaken-emoji').addClass('hidden');
 		$('#submit-sticker-btn').removeClass('unclickable');
 	}
 
