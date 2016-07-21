@@ -12,7 +12,7 @@
 	$stickers = json_decode($stickerJSON, true);
 
 	//check emoji JSON file
-	$emojiJSON = file_get_contents('emojis.json');
+	$emojiJSON = file_get_contents('resources/data/emojis.json');
 	$emojis = json_decode($emojiJSON, true);
 
 	//Add to JSON file if stickerName doesn't already exist, isn't taken by an emoji, and stickerURL contains .jpg or .png

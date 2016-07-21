@@ -79,7 +79,7 @@ bindDynamicSearch();
 displayStickers();
 
 //Store emoji array
-$.getJSON('emojis.json', function(data){
+$.getJSON('resources/data/emojis.json', function(data){
 	emojiList = data.emojis;
 });
 
