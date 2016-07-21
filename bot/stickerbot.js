@@ -1,3 +1,5 @@
+'use strict';
+
 var Discord = require('discord.js');
 var fs = require('fs');
 var gm = require('gm');
@@ -16,7 +18,28 @@ function getAuthorDisplayName(message){
 	return message.channel.server.detailsOf(message.author).nick || message.author.username;
 }
 
+/**
+ * Get timestamp from date
+ * @date {date object}
+ * @returns {string} timestamp in format YYYY-MM-D-H-M-S-MS 
+ */
+function getTimestamp(date){
+	let d = date;
+	return [
+		d.getFullYear(),
+		d.getMonth() + 1,
+		d.getDate(),
+		d.getHours(),
+		d.getMinutes(),
+		d.getSeconds(),
+		d.getMilliseconds()
+	].join('-');
+}
 
+/**
+ * Check if file with path `filename` exists 
+ * @returns {boolean} 
+ */
 function fileExists(filename) {
   try {
     fs.accessSync(filename);
@@ -52,7 +75,7 @@ function respondTo(triggerMessage){
 
 	//Check JSON file online for stickers
 	request({
-		url: 'http://darylpinto.com/stickerbot/stickers.json?nocache=' + (new Date()).getTime(),
+		url: 'http://darylpinto.com/stickerbot/stickers.json?nocache=' + getTimestamp(new Date()),
 		json: true
 	}, readStickerDB);
 
@@ -123,6 +146,13 @@ bot.on('message', function(message){
 
 });
 
-bot.login(credentials.email, credentials.password, function(){
-	console.log('Logged in!\n');
-});
+bot.login(credentials.email, credentials.password)
+	.then(function(token){
+		console.log('Successfully logged in!\n');	
+	})
+	.catch(function(error){
+		fs.writeFile(`./crash-logs/loginfailure-${getTimestamp(new Date())}.txt`,	error, 'utf8', (err) => {
+			if(err) throw err; 
+			console.log('ERROR: Unable log in!\nCheck the crash logs for a detailed report.');
+		});
+	});

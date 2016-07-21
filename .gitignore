@@ -1,5 +1,4 @@
 node_modules
-bot/login-info.json
-bot/login-info-old.json
-bot/cache/*.png
-bot/cache/compressed/*.png
+bot/login*.json
+bot/crash-logs/*.txt
+bot/cache/**/*.png
