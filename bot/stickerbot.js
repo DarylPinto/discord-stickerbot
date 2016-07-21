@@ -1,13 +1,13 @@
 'use strict';
 
-var Discord = require('discord.js');
-var fs = require('fs');
-var gm = require('gm');
-var request = require('request');
-var credentials = require('./login-info.json');
-
-var bot = new Discord.Client();
-var commandSymbol = ':';
+let Discord = require('discord.js'),
+    fs = require('fs'),
+    gm = require('gm'),
+    request = require('request'),
+    rp = require('request-promise'),
+    credentials = require('./login-info.json'),
+    bot = new Discord.Client(),
+    stickers = null;
 
 /**
  * Returns user's display name
@@ -54,94 +54,86 @@ function fileExists(filename) {
  * @uri {string} direct image link 
  * @filename {string} filename to save image as
  * @callback {function} callback function
- */
+ *
 function download(uri, filename, callback){
   request.head(uri, function(err, res, body){
-    console.log('content-type:', res.headers['content-type']);
-    console.log('content-length:', res.headers['content-length']);
-    console.log('\n');
-
-    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+    
   });
-};
+};*/
 
-/**
- * Responds to a message
- * @triggerMessage {Message object} message that triggered the bot 
- */
-function respondTo(triggerMessage){
+function download(uri, filename){
+	rp.head(uri)
+		.then(function(){
+			console.log('content-type:', res.headers['content-type']);
+			console.log('content-length:', res.headers['content-length']);
+			rp(uri).pipe(fs.createWriteStream(filename)).on('close');	
+		})
+}
 
-	var stickers;
-
-	//Check JSON file online for stickers
+function stickerExists(stickerKey){
+	let stickerExists = true; //SHOULD BE FALSE TO START WITH
 	request({
 		url: 'http://darylpinto.com/stickerbot/stickers.json?nocache=' + getTimestamp(new Date()),
 		json: true
-	}, readStickerDB);
+	}, function(error, response, body){
 
-	/**
-	 * Store sticker data 
-	 */
-	function readStickerDB(error, response, body){
-
-		if(error) console.log(error);
+		if(error) throw error;
 		if (!error && response.statusCode === 200){
 			//Store JSON file object
 			stickers = body;
-		}
-
-		postSticker();
-
-	}
-
-	/**
-	 * Sends sticker to discord text channel
-	 */
-	function postSticker(){
-
-		var stickerKey = triggerMessage.content.slice(1, triggerMessage.content.length - 1);
-		var cachePath = `cache/${stickerKey}.png`;
-		var compressedPath = `cache/compressed/${stickerKey}.png`;
-
-		if(typeof stickers[stickerKey] === 'string'){
-
-
-			console.time('Sticker Response Time');
-			//Delete the message that triggered the response
-			bot.deleteMessage(triggerMessage);
-
-			//Post Sticker
-			if( !fileExists(cachePath) ){
-
-				download(stickers[stickerKey], cachePath, function(){
-					
-					gm(cachePath)
-					.resize(350, 350)
-					.noProfile()
-					.write(compressedPath, function (err) {
-					  bot.sendFile(triggerMessage, compressedPath, compressedPath, '**' + getAuthorDisplayName(triggerMessage) + ':**', () => console.timeEnd('Sticker Response Time'));
-					});
-
-				});
-
-			}else{
-
-				bot.sendFile(triggerMessage, compressedPath, compressedPath, '**' + getAuthorDisplayName(triggerMessage) + ':**', () => console.timeEnd('Sticker Response Time'));
-
+			if( typeof stickers[stickerKey] === 'string' ){
+				stickerExists = true;	
 			}
 		}
-	}
+
+	});
+	return stickerExists;
+}
+
+function cacheStickerAndPost(stickerKey, message){
+  console.log(`Caching sticker: ${stickerKey}`);
+
+  let tempPath = `cache/temp/${stickerKey}.png`;
+  let cachePath = `cache/${stickerKey}.png`;
+
+	download(stickers[stickerKey], tempPath, function(){
+		gm(tempPath)
+		.resize(350, 350)
+		.noProfile()
+		.write(cachePath, function(err) {
+			if(err) throw err;
+		  postSticker(stickerKey, message);
+		  fs.unlink(tempPath);
+		});
+	});
+}
+
+function postSticker(stickerKey, message){
+	let cachePath = `cache/${stickerKey}.png`;
+	bot.sendFile(
+		stickerKey,
+		cachePath,
+		cachePath,
+		'**' + getAuthorDisplayName(message) + ':**'
+	);
 }
 
 bot.on('message', function(message){
-	//For bot to respond, trimmed message must:
+
+	let messageContent = message.content.trim().toLowerCase();
+
+	//For bot to respond, trimmed, lowercased message must:
 	// - Start and end with :
 	// - Have between 1 and infinite letter/number characters
-	if( /^:[a-z0-9]+:$/.test( message.content.trim() ) ){
-	
-		message.content = message.content.toLowerCase();
-		respondTo(message);
-		
+	if( /^:[a-z0-9]+:$/.test(messageContent) ){	
+
+		let stickerKey = messageContent.replace(/:/g, '');
+
+		if( stickerExists(stickerKey) ){
+			if( !fileExists(`cache/${stickerKey}.png`) ){ cacheStickerAndPost(stickerKey, message) }
+			else{	postSticker() }
+		}
+
 	}
 
 });
