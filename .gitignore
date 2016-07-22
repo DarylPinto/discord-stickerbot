@@ -1,4 +1,4 @@
 node_modules
 bot/login*.json
-bot/crash-logs/*.txt
-bot/cache/**/*.png
+bot/crash-logs
+bot/cache

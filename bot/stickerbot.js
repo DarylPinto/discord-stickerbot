@@ -18,6 +18,18 @@ function getAuthorDisplayName(message){
 	return message.channel.server.detailsOf(message.author).nick || message.author.username;
 }
 
+function crash(error, crashtype, message){
+
+	crashtype = crashtype || 'crash';
+	message = message || error;
+
+	if( !pathExists('crash-logs') ) fs.mkdirSync('crash-logs');
+	fs.writeFile(`./crash-logs/${crashtype}-${getTimestamp(new Date())}.txt`,	error, 'utf8', (err) => {
+		if(err) throw err; 
+		console.log(`${message}\nCheck the crash logs for more details.`);
+	});
+}
+
 /**
  * Get timestamp from date
  * @date {date object}
@@ -40,9 +52,9 @@ function getTimestamp(date){
  * Check if file with path `filename` exists 
  * @returns {boolean} 
  */
-function fileExists(filename) {
+function pathExists(path) {
   try {
-    fs.accessSync(filename);
+    fs.accessSync(path);
     return true;
   } catch(ex) {
     return false;
@@ -130,7 +142,7 @@ bot.on('message', function(message){
 		let stickerKey = messageContent.replace(/:/g, '');
 
 		if( stickerExists(stickerKey) ){
-			if( !fileExists(`cache/${stickerKey}.png`) ){ cacheStickerAndPost(stickerKey, message) }
+			if( !pathExists(`cache/${stickerKey}.png`) ){ cacheStickerAndPost(stickerKey, message) }
 			else{	postSticker() }
 		}
 
@@ -140,11 +152,12 @@ bot.on('message', function(message){
 
 bot.login(credentials.email, credentials.password)
 	.then(function(token){
+
+		if( !pathExists('cache') ) fs.mkdirSync('cache');
+		if( !pathExists('cache/temp') ) fs.mkdirSync('cache/temp');
+
 		console.log('Successfully logged in!\n');	
 	})
 	.catch(function(error){
-		fs.writeFile(`./crash-logs/loginfailure-${getTimestamp(new Date())}.txt`,	error, 'utf8', (err) => {
-			if(err) throw err; 
-			console.log('ERROR: Unable log in!\nCheck the crash logs for a detailed report.');
-		});
+		crash(error, 'loginfailure', 'Unable to login!');
 	});
