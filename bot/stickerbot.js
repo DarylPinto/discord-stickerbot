@@ -64,28 +64,28 @@ function pathExists(path) {
 /**
  * Downloads an image from a link
  * @uri {string} direct image link 
- * @filename {string} filename to save image as
- * @callback {function} callback function
- *
-function download(uri, filename, callback){
-  request.head(uri, function(err, res, body){
-    
-  });
-};*/
+ * @stickerName {string} name to download sticker as
+ * @returns {Promise}
+ */
+function download(uri, stickerName){
+return new Promise(function(resolve, reject){
 
-function download(uri, filename){
-	rp.head(uri)
-		.then(function(){
-			console.log('content-type:', res.headers['content-type']);
-			console.log('content-length:', res.headers['content-length']);
-			rp(uri).pipe(fs.createWriteStream(filename)).on('close');	
-		})
+  let path = `cache/temp/${stickerName}.png`;
+
+	request.head(uri, (err, res, body) => {
+		if(err) reject(err);
+		request(uri).pipe(fs.createWriteStream(filename)).on('close', () => {
+			resolve({sticker: stickerName});	
+		});
+	});
+
+});	
 }
 
 function stickerExists(stickerKey){
 	let stickerExists = true; //SHOULD BE FALSE TO START WITH
 	request({
-		url: 'http://darylpinto.com/stickerbot/stickers.json?nocache=' + getTimestamp(new Date()),
+		url: `http://darylpinto.com/stickerbot/stickers.json?nocache=${getTimestamp(new Date())}`,
 		json: true
 	}, function(error, response, body){
 
@@ -105,7 +105,6 @@ function stickerExists(stickerKey){
 function cacheStickerAndPost(stickerKey, message){
   console.log(`Caching sticker: ${stickerKey}`);
 
-  let tempPath = `cache/temp/${stickerKey}.png`;
   let cachePath = `cache/${stickerKey}.png`;
 
 	download(stickers[stickerKey], tempPath, function(){
@@ -126,7 +125,7 @@ function postSticker(stickerKey, message){
 		stickerKey,
 		cachePath,
 		cachePath,
-		'**' + getAuthorDisplayName(message) + ':**'
+		`**${getAuthorDisplayName(message)}:**`
 	);
 }
 
@@ -141,10 +140,15 @@ bot.on('message', function(message){
 
 		let stickerKey = messageContent.replace(/:/g, '');
 
-		if( stickerExists(stickerKey) ){
+		download('http://i.imgur.com/IEZZE5F.png', 'cache/temp/sticker.png')
+			.then(function(ob){
+        console.log(ob.data + ' ayyyyy we gotem');
+      });
+
+		/*if( stickerExists(stickerKey) ){
 			if( !pathExists(`cache/${stickerKey}.png`) ){ cacheStickerAndPost(stickerKey, message) }
 			else{	postSticker() }
-		}
+		}*/
 
 	}
 
