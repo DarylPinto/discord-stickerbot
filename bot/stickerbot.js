@@ -19,7 +19,6 @@ function getAuthorDisplayName(message){
 }
 
 function crash(error, crashtype, message){
-
 	crashtype = crashtype || 'crash';
 	message = message || error;
 
@@ -75,11 +74,11 @@ return new Promise(function(resolve, reject){
 	request.head(uri, (err, res, body) => {
 		if(err) reject(err);
 		request(uri).pipe(fs.createWriteStream(filename)).on('close', () => {
-			resolve({sticker: stickerName});	
+			resolve({result: stickerName});	
 		});
 	});
 
-});	
+});
 }
 
 function stickerExists(stickerKey){
@@ -102,7 +101,26 @@ function stickerExists(stickerKey){
 	return stickerExists;
 }
 
-function cacheStickerAndPost(stickerKey, message){
+function checkIfStickerExists(stickerKey){
+return new Promise(function(resolve, reject){
+
+  request({
+    url: `http://darylpinto.com/stickerbot/stickers.json?nocache=${getTimestamp(new Date())}`,
+    json: true
+  }, (error, response, body) => {
+
+    if(error) reject(error);
+    if (!error && response.statusCode === 200){
+      //Store JSON file object
+      stickers = body;
+      resolve({exists: true});
+    }
+  });
+
+});
+}
+
+function cacheSticker(stickerKey, message){
   console.log(`Caching sticker: ${stickerKey}`);
 
   let cachePath = `cache/${stickerKey}.png`;
@@ -113,7 +131,6 @@ function cacheStickerAndPost(stickerKey, message){
 		.noProfile()
 		.write(cachePath, function(err) {
 			if(err) throw err;
-		  postSticker(stickerKey, message);
 		  fs.unlink(tempPath);
 		});
 	});
@@ -145,6 +162,13 @@ bot.on('message', function(message){
         console.log(ob.data + ' ayyyyy we gotem');
       });
 
+    checkIfStickerExists(stickerKey)
+      .then(function(result){
+        if(result.exists){
+          console.log('we got that in da warehouse');
+        }
+      });
+
 		/*if( stickerExists(stickerKey) ){
 			if( !pathExists(`cache/${stickerKey}.png`) ){ cacheStickerAndPost(stickerKey, message) }
 			else{	postSticker() }
@@ -160,7 +184,7 @@ bot.login(credentials.email, credentials.password)
 		if( !pathExists('cache') ) fs.mkdirSync('cache');
 		if( !pathExists('cache/temp') ) fs.mkdirSync('cache/temp');
 
-		console.log('Successfully logged in!\n');	
+		console.log('Successfully logged in!\n');
 	})
 	.catch(function(error){
 		crash(error, 'loginfailure', 'Unable to login!');
