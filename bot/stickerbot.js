@@ -1,14 +1,15 @@
 'use strict';
 
 let Discord = require('discord.js'),
-    fs = require('fs'),
-    mv = require('mv'),
-    gm = require('gm'),
-    request = require('request'),
-    rp = require('request-promise'),
-    credentials = require('./login-info.json'),
-    bot = new Discord.Client(),
-    stickers = null;
+		fs = require('fs'),
+		fsp = require('fs-promise'),
+		mv = require('mv'),
+		gm = require('gm'),
+		request = require('request'),
+		rp = require('request-promise'),
+		credentials = require('./login-info.json'),
+		bot = new Discord.Client(),
+		stickers = null;
 
 /**
  * Returns user's display name
@@ -24,7 +25,7 @@ function crash(error, crashtype, message){
 	message = message || error;
 
 	if( !pathExists('crash-logs') ) fs.mkdirSync('crash-logs');
-	fs.writeFile(`./crash-logs/${crashtype}-${getTimestamp(new Date())}.txt`,	error, 'utf8', (err) => {
+	fs.writeFile(`./crash-logs/${crashtype}-${getTimestamp(new Date())}.log`,	error, 'utf8', (err) => {
 		if(err) throw err; 
 		console.log(`${message}\nCheck the crash logs for more details.`);
 	});
@@ -53,12 +54,12 @@ function getTimestamp(date){
  * @returns {boolean} 
  */
 function pathExists(path) {
-  try {
-    fs.accessSync(path);
-    return true;
-  } catch(ex) {
-    return false;
-  }
+	try {
+		fs.accessSync(path);
+		return true;
+	} catch(ex) {
+		return false;
+	}
 }
 
 /**
@@ -70,13 +71,13 @@ function pathExists(path) {
 function download(stickerName){
 return new Promise(function(resolve, reject){
 
-  let path = `cache/temp/${stickerName}.png`;
-  let uri = stickers[stickerName];
+	let path = `cache/temp/${stickerName}.png`;
+	let uri = stickers[stickerName];
 
 	request.head(uri, (err, res, body) => {
 		if(err) reject(err);
 		request(uri).pipe(fs.createWriteStream(path)).on('close', () => {
-			resolve({result: stickerName});	
+			resolve();	
 		});
 	});
 
@@ -86,22 +87,38 @@ return new Promise(function(resolve, reject){
 function stickerInDB(stickerName){
 return new Promise(function(resolve, reject){
 
-  request({
-    url: `http://darylpinto.com/stickerbot/stickers.json?nocache=${getTimestamp(new Date())}`,
-    json: true
-  }, (error, response, body) => {
+	request({
+		url: `http://darylpinto.com/stickerbot/stickers.json?nocache=${getTimestamp(new Date())}`,
+		json: true
+	}, (error, response, body) => {
 
-    if(error) reject(error);
-    if (!error && response.statusCode === 200){
-      //Store JSON file object
-      stickers = body;
-      if(typeof stickers[stickerName] === 'string'){
-      	resolve({exists: true});
-      }else{
-      	resolve({exists: false});
-      }
-    }
-  });
+		if(error) reject(error);
+		if (!error && response.statusCode === 200){
+			//Store JSON file object
+			stickers = body;
+			if(typeof stickers[stickerName] === 'string'){
+				resolve(true);
+			}else{
+				resolve(false);
+			}
+		}
+	});
+
+});
+}
+
+function resizeSticker(stickerName, size){
+return new Promise(function(resolve, reject){
+
+	let image = gm(`cache/temp/${stickerName}.png`);
+
+	image
+	.resize(size, size)
+	.noProfile()
+	.write(`cache/${stickerName}.png`, (err)=>{
+		if(err) crash(err);
+		resolve();
+	});
 
 });
 }
@@ -112,22 +129,17 @@ return new Promise(function(resolve, reject){
 	let image = gm(`cache/temp/${stickerName}.png`);
 
 	image.size(function(err, size){
+
 		if(err) crash(err);
 		if(size.width > 350 || size.height > 350){
-			image
-			.resize(350, 350)
-			.noProfile()
-			.write(`cache/${stickerName}.png`, (err)=>{
-				if(err) crash(err);
-				fs.unlink(`cache/temp/${stickerName}.png`, () => {
-					resolve({cached: true});
-				});
-			});	
-		}else{
-			mv(`cache/temp/${stickerName}.png`, `cache/${stickerName}.png`, () => {
-				resolve({cached: true});
+			resizeSticker(stickerName, 350)
+			.then(function(){
+				fs.unlink(`cache/temp/${stickerName}.png`, resolve);
 			});
+
 		}
+		else mv(`cache/temp/${stickerName}.png`, `cache/${stickerName}.png`, resolve);
+
 	});
 
 });
@@ -154,20 +166,23 @@ bot.on('message', function(message){
 
 		let stickerName = messageContent.replace(/:/g, '');
 
-    stickerInDB(stickerName)
-      .then(function(result){
+		stickerInDB(stickerName)
+		.then(function(exists){
 
-        if(result.exists){
-					download(stickerName)
-						.then(function(){
-							cacheSticker(stickerName)
-						});    
-        }
+			if(exists){
+				download(stickerName)
+				.then(function(){
+					cacheSticker(stickerName);
+				})
+				.then(function(){
+					console.log(`Cached "${stickerName}" sticker`);
+				})   
+			}
 
-      });
+		});
 
-    /*stickerIsCached(stickerName)
-    	postSticker()*/
+		/*stickerIsCached(stickerName)
+			postSticker()*/
 
 	}
 });
