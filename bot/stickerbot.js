@@ -2,12 +2,11 @@
 
 let Discord = require('discord.js'),
 		fs = require('fs'),
-		fsp = require('fs-promise'),
 		mv = require('mv'),
 		gm = require('gm'),
 		request = require('request'),
-		rp = require('request-promise'),
 		credentials = require('./login-info.json'),
+		async = require('async'),
 		bot = new Discord.Client(),
 		stickers = null;
 
@@ -85,7 +84,6 @@ return new Promise(function(resolve, reject){
 }
 
 function stickerInDB(stickerName){
-return new Promise(function(resolve, reject){
 
 	request({
 		url: `http://darylpinto.com/stickerbot/stickers.json?nocache=${getTimestamp(new Date())}`,
@@ -97,14 +95,13 @@ return new Promise(function(resolve, reject){
 			//Store JSON file object
 			stickers = body;
 			if(typeof stickers[stickerName] === 'string'){
-				resolve(true);
+				return true;
 			}else{
-				resolve(false);
+				return false;
 			}
 		}
 	});
 
-});
 }
 
 function resizeSticker(stickerName, size){
@@ -124,25 +121,24 @@ return new Promise(function(resolve, reject){
 }
 
 function cacheSticker(stickerName){
-return new Promise(function(resolve, reject){
 
 	let image = gm(`cache/temp/${stickerName}.png`);
 
-	image.size(function(err, size){
+	image.size((err, size) => {
 
 		if(err) crash(err);
 		if(size.width > 350 || size.height > 350){
 			resizeSticker(stickerName, 350)
-			.then(function(){
-				fs.unlink(`cache/temp/${stickerName}.png`, resolve);
-			});
-
+				.then(()=>{	fs.unlink(`cache/temp/${stickerName}.png`) });
 		}
-		else mv(`cache/temp/${stickerName}.png`, `cache/${stickerName}.png`, resolve);
+		else mv(`cache/temp/${stickerName}.png`, `cache/${stickerName}.png`);
 
 	});
 
-});
+}
+
+function stickerIsCached(stickerName){
+	return pathExists(`cache/${stickerName}.png`);
 }
 
 function postSticker(stickerName, message){
@@ -166,23 +162,24 @@ bot.on('message', function(message){
 
 		let stickerName = messageContent.replace(/:/g, '');
 
-		stickerInDB(stickerName)
-		.then(function(exists){
-
-			if(exists){
-				download(stickerName)
-				.then(function(){
-					cacheSticker(stickerName);
-				})
-				.then(function(){
-					console.log(`Cached "${stickerName}" sticker`);
-				})   
+		async.parallel({
+			stickerInDB: function(cb){
+				
+			},
+			stickerCached: function(cb){
+				
 			}
+		}, (results) => {
+			let stickerInDB = results[0];
+			let stickerIsCached = results[1];
+			console.log(results);
 
+			if(stickerIsCached){
+				postSticker();	
+			}else if(stickerInDB && !stickerIsCached){
+				async.series([cacheSticker,	postSticker]);	
+			}
 		});
-
-		/*stickerIsCached(stickerName)
-			postSticker()*/
 
 	}
 });
