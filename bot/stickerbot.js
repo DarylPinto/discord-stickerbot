@@ -2,6 +2,7 @@
 
 let Discord = require('discord.js'),
     fs = require('fs'),
+    mv = require('mv'),
     gm = require('gm'),
     request = require('request'),
     rp = require('request-promise'),
@@ -66,14 +67,15 @@ function pathExists(path) {
  * @stickerName {string} name to download sticker as
  * @returns {Promise}
  */
-function download(uri, stickerName){
+function download(stickerName){
 return new Promise(function(resolve, reject){
 
   let path = `cache/temp/${stickerName}.png`;
+  let uri = stickers[stickerName];
 
 	request.head(uri, (err, res, body) => {
 		if(err) reject(err);
-		request(uri).pipe(fs.createWriteStream(filename)).on('close', () => {
+		request(uri).pipe(fs.createWriteStream(path)).on('close', () => {
 			resolve({result: stickerName});	
 		});
 	});
@@ -81,27 +83,7 @@ return new Promise(function(resolve, reject){
 });
 }
 
-function stickerExists(stickerKey){
-	let stickerExists = true; //SHOULD BE FALSE TO START WITH
-	request({
-		url: `http://darylpinto.com/stickerbot/stickers.json?nocache=${getTimestamp(new Date())}`,
-		json: true
-	}, function(error, response, body){
-
-		if(error) throw error;
-		if (!error && response.statusCode === 200){
-			//Store JSON file object
-			stickers = body;
-			if( typeof stickers[stickerKey] === 'string' ){
-				stickerExists = true;	
-			}
-		}
-
-	});
-	return stickerExists;
-}
-
-function checkIfStickerExists(stickerKey){
+function stickerInDB(stickerName){
 return new Promise(function(resolve, reject){
 
   request({
@@ -113,33 +95,48 @@ return new Promise(function(resolve, reject){
     if (!error && response.statusCode === 200){
       //Store JSON file object
       stickers = body;
-      resolve({exists: true});
+      if(typeof stickers[stickerName] === 'string'){
+      	resolve({exists: true});
+      }else{
+      	resolve({exists: false});
+      }
     }
   });
 
 });
 }
 
-function cacheSticker(stickerKey, message){
-  console.log(`Caching sticker: ${stickerKey}`);
+function cacheSticker(stickerName){
+return new Promise(function(resolve, reject){
 
-  let cachePath = `cache/${stickerKey}.png`;
+	let image = gm(`cache/temp/${stickerName}.png`);
 
-	download(stickers[stickerKey], tempPath, function(){
-		gm(tempPath)
-		.resize(350, 350)
-		.noProfile()
-		.write(cachePath, function(err) {
-			if(err) throw err;
-		  fs.unlink(tempPath);
-		});
+	image.size(function(err, size){
+		if(err) crash(err);
+		if(size.width > 350 || size.height > 350){
+			image
+			.resize(350, 350)
+			.noProfile()
+			.write(`cache/${stickerName}.png`, (err)=>{
+				if(err) crash(err);
+				fs.unlink(`cache/temp/${stickerName}.png`, () => {
+					resolve({cached: true});
+				});
+			});	
+		}else{
+			mv(`cache/temp/${stickerName}.png`, `cache/${stickerName}.png`, () => {
+				resolve({cached: true});
+			});
+		}
 	});
+
+});
 }
 
-function postSticker(stickerKey, message){
-	let cachePath = `cache/${stickerKey}.png`;
+function postSticker(stickerName, message){
+	let cachePath = `cache/${stickerName}.png`;
 	bot.sendFile(
-		stickerKey,
+		stickerName,
 		cachePath,
 		cachePath,
 		`**${getAuthorDisplayName(message)}:**`
@@ -155,27 +152,24 @@ bot.on('message', function(message){
 	// - Have between 1 and infinite letter/number characters
 	if( /^:[a-z0-9]+:$/.test(messageContent) ){	
 
-		let stickerKey = messageContent.replace(/:/g, '');
+		let stickerName = messageContent.replace(/:/g, '');
 
-		download('http://i.imgur.com/IEZZE5F.png', 'cache/temp/sticker.png')
-			.then(function(ob){
-        console.log(ob.data + ' ayyyyy we gotem');
-      });
-
-    checkIfStickerExists(stickerKey)
+    stickerInDB(stickerName)
       .then(function(result){
+
         if(result.exists){
-          console.log('we got that in da warehouse');
+					download(stickerName)
+						.then(function(){
+							cacheSticker(stickerName)
+						});    
         }
+
       });
 
-		/*if( stickerExists(stickerKey) ){
-			if( !pathExists(`cache/${stickerKey}.png`) ){ cacheStickerAndPost(stickerKey, message) }
-			else{	postSticker() }
-		}*/
+    /*stickerIsCached(stickerName)
+    	postSticker()*/
 
 	}
-
 });
 
 bot.login(credentials.email, credentials.password)
