@@ -83,7 +83,7 @@ return new Promise(function(resolve, reject){
 });
 }
 
-function stickerInDB(stickerName){
+function stickerInDB(stickerName, callback){
 
 	request({
 		url: `http://darylpinto.com/stickerbot/stickers.json?nocache=${getTimestamp(new Date())}`,
@@ -95,9 +95,9 @@ function stickerInDB(stickerName){
 			//Store JSON file object
 			stickers = body;
 			if(typeof stickers[stickerName] === 'string'){
-				return true;
+				callback(null, true);
 			}else{
-				return false;
+				callback(null, false);
 			}
 		}
 	});
@@ -122,6 +122,7 @@ return new Promise(function(resolve, reject){
 
 function cacheSticker(stickerName){
 
+	console.log(`Caching ${stickerName}...`);
 	let image = gm(`cache/temp/${stickerName}.png`);
 
 	image.size((err, size) => {
@@ -135,10 +136,6 @@ function cacheSticker(stickerName){
 
 	});
 
-}
-
-function stickerIsCached(stickerName){
-	return pathExists(`cache/${stickerName}.png`);
 }
 
 function postSticker(stickerName, message){
@@ -162,25 +159,35 @@ bot.on('message', function(message){
 
 		let stickerName = messageContent.replace(/:/g, '');
 
-		async.parallel({
-			stickerInDB: function(cb){
-				
+		async.parallel([
+			//Is sticker cached?
+			function(callback){
+				let stickerIsCached = pathExists(`cache/${stickerName}.png`);
+				callback(null, stickerIsCached);
 			},
-			stickerCached: function(cb){
-				
+			//Is sticker in database?
+			function(callback){
+				stickerInDB(stickerName, callback);
 			}
-		}, (results) => {
-			let stickerInDB = results[0];
-			let stickerIsCached = results[1];
+		], (err, results) => {
+
+			let stickerIsCached = results[0];
+			let stickerInDB = results[1];
 			console.log(results);
 
 			if(stickerIsCached){
 				postSticker();	
 			}else if(stickerInDB && !stickerIsCached){
-				async.series([cacheSticker,	postSticker]);	
+				async.series([
+					function(){
+						cacheSticker(stickerName)
+					},
+					function(){
+						postSticker(stickerName);
+					}
+				]);	
 			}
 		});
-
 	}
 });
 
