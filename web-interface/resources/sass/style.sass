@@ -63,6 +63,14 @@ main
 		position: relative
 		width: 21%
 		margin-bottom: 40px
+		.fa-star, .fa-star-o
+			position: absolute
+			top: 10px
+			right: 10px
+			font-size: 30px
+			color: #ffd600
+			cursor: pointer
+			display: none
 		.image-area
 			height: 220px
 			display: flex
@@ -82,6 +90,18 @@ main
 			position: absolute
 			bottom: 0
 			width: 100%
+
+.sticker:hover .fa-star-o
+	display: inline
+	color: white
+	opacity: 0.3
+
+.sticker.favorited
+	.fa-star-o
+		display: none
+	.fa-star
+		display: inline
+
 
 #open-sticker-dialog-btn
 	background-color: #51a951
@@ -176,6 +196,9 @@ main
 		height: 140px
 		margin: 0 auto
 		margin-top: 20px
+
+.sr-only
+	color: transparent
 
 .warning
 	color: white

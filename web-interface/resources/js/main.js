@@ -1,6 +1,7 @@
 var stickerData;
 var emojiList;
 var stickerElements = [];
+var favorites = [];
 
 //Get value from querystring paramaters
 //stackoverflow.com/q/901115
@@ -14,11 +15,25 @@ function querystringParam(name, url) {
 	return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
+//Remove `item` from `arr`
+function removeFromArray(arr, value) {
+    var what, a = arguments, L = a.length, ax;
+    while (L && arr.length) {
+        what = a[--L];
+        while ((ax = arr.indexOf(what)) !== -1) {
+            arr.splice(ax, 1);
+        }
+    }
+    return arr;
+};
+
 //Store array of HTML strings for each sticker
 function storeStickers(key, val){
 
 	stickerElements.push(''+
 		'<div class="sticker">' +
+			'<i class="fa fa-star" aria-hidden="true"></i>' +
+			'<i class="fa fa-star-o" aria-hidden="true" title="Favorite this sticker"></i>' +
 			'<div class="image-area" style="background-image: url('+val+')"></div>' +
 			'<p>:'+key+':</p>	' +
 		'</div>'
@@ -57,8 +72,28 @@ function displayStickers(){
 		});
 
 		bindDynamicSearch();
+		bindFavoriteStickers();
 
 	});
+}
+
+//Favorite/Unfavorite Stickers
+function bindFavoriteStickers(){
+
+	//Add sticker
+	$('.fa-star-o').click(function(){
+		$(this).closest('.sticker').addClass('favorited');
+		var stickerName = $(this).siblings('p').text().replace(/:/g, '');
+		favorites.push(stickerName);
+	});
+
+	//Remove sticker
+	$('.fa-star').click(function(){
+		$(this).closest('.sticker').removeClass('favorited');
+		var stickerName = $(this).siblings('p').text().replace(/:/g, '');
+		removeFromArray(favorites, stickerName);
+	});
+
 }
 
 //Prepare imgur image to be stored in stickers JSON file
