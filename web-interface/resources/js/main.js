@@ -73,6 +73,7 @@ function displayStickers(){
 
 		bindDynamicSearch();
 		bindFavoriteStickers();
+		loadFavorites();
 
 	});
 }
@@ -85,6 +86,7 @@ function bindFavoriteStickers(){
 		$(this).closest('.sticker').addClass('favorited');
 		var stickerName = $(this).siblings('p').text().replace(/:/g, '');
 		favorites.push(stickerName);
+		createCookie('favorites', JSON.stringify(favorites), 3650);
 	});
 
 	//Remove sticker
@@ -92,8 +94,21 @@ function bindFavoriteStickers(){
 		$(this).closest('.sticker').removeClass('favorited');
 		var stickerName = $(this).siblings('p').text().replace(/:/g, '');
 		removeFromArray(favorites, stickerName);
+		createCookie('favorites', JSON.stringify(favorites), 3650);
 	});
 
+}
+
+function loadFavorites(){
+	//Read favorite stickers from cookies
+	var cachedFavorites = readCookie('favorites');
+	favorites = (cachedFavorites === null) ? favorites : JSON.parse(cachedFavorites);
+	$('.sticker').each(function(){
+		var stickerName = $(this).find('p').text().replace(/:/g, '');
+		if( $.inArray(stickerName, favorites) > -1 ){
+			$(this).addClass('favorited');
+		}
+	});
 }
 
 //Prepare imgur image to be stored in stickers JSON file
@@ -130,6 +145,7 @@ new Imgur({
 
 });
 
+//Hide "add sticker" button unless url has ?add at the end
 $('.status').addClass('hidden');
 
 if( querystringParam('add') != null ){
