@@ -31,7 +31,7 @@ function removeFromArray(arr, value) {
 function storeStickers(key, val){
 
 	stickerElements.push(''+
-		'<div class="sticker">' +
+		'<div class="sticker" title="Click to copy!" data-clipboard-text=":'+key+':">' +
 			'<i class="fa fa-star" aria-hidden="true"></i>' +
 			'<i class="fa fa-star-o" aria-hidden="true" title="Favorite this sticker"></i>' +
 			'<div class="image-area" style="background-image: url('+val+')"></div>' +
@@ -74,6 +74,7 @@ function displayStickers(){
 		bindDynamicSearch();
 		bindFavoriteStickers();
 		loadFavorites();
+		new Clipboard('.sticker');
 
 	});
 }
