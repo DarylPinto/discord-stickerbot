@@ -44,3 +44,7 @@ $('input[name="stickerName"]').blur(function(){
 $('.close-x').click(function(){
 	liteModal.close();
 });
+
+$(document).ready(function(){
+	$('#sticker-search').focus();
+});

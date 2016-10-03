@@ -1,6 +1,7 @@
 var stickerData;
 var emojiList;
 var stickerElements = [];
+var favorites = [];
 
 //Get value from querystring paramaters
 //stackoverflow.com/q/901115
@@ -14,11 +15,25 @@ function querystringParam(name, url) {
 	return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
+//Remove `item` from `arr`
+function removeFromArray(arr, value) {
+    var what, a = arguments, L = a.length, ax;
+    while (L && arr.length) {
+        what = a[--L];
+        while ((ax = arr.indexOf(what)) !== -1) {
+            arr.splice(ax, 1);
+        }
+    }
+    return arr;
+};
+
 //Store array of HTML strings for each sticker
 function storeStickers(key, val){
 
 	stickerElements.push(''+
 		'<div class="sticker">' +
+			'<i class="fa fa-star" aria-hidden="true"></i>' +
+			'<i class="fa fa-star-o" aria-hidden="true" title="Favorite this sticker"></i>' +
 			'<div class="image-area" style="background-image: url('+val+')"></div>' +
 			'<p>:'+key+':</p>	' +
 		'</div>'
@@ -57,7 +72,42 @@ function displayStickers(){
 		});
 
 		bindDynamicSearch();
+		bindFavoriteStickers();
+		loadFavorites();
 
+	});
+}
+
+//Favorite/Unfavorite Stickers
+function bindFavoriteStickers(){
+
+	//Add sticker
+	$('.fa-star-o').click(function(){
+		$(this).closest('.sticker').addClass('favorited');
+		var stickerName = $(this).siblings('p').text().replace(/:/g, '');
+		favorites.push(stickerName);
+		createCookie('favorites', JSON.stringify(favorites), 3650);
+	});
+
+	//Remove sticker
+	$('.fa-star').click(function(){
+		$(this).closest('.sticker').removeClass('favorited');
+		var stickerName = $(this).siblings('p').text().replace(/:/g, '');
+		removeFromArray(favorites, stickerName);
+		createCookie('favorites', JSON.stringify(favorites), 3650);
+	});
+
+}
+
+function loadFavorites(){
+	//Read favorite stickers from cookies
+	var cachedFavorites = readCookie('favorites');
+	favorites = (cachedFavorites === null) ? favorites : JSON.parse(cachedFavorites);
+	$('.sticker').each(function(){
+		var stickerName = $(this).find('p').text().replace(/:/g, '');
+		if( $.inArray(stickerName, favorites) > -1 ){
+			$(this).addClass('favorited');
+		}
 	});
 }
 
@@ -95,6 +145,7 @@ new Imgur({
 
 });
 
+//Hide "add sticker" button unless url has ?add at the end
 $('.status').addClass('hidden');
 
 if( querystringParam('add') != null ){
