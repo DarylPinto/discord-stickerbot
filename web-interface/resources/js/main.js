@@ -57,6 +57,18 @@ function bindDynamicSearch(){
 	});
 }
 
+function bindNotifyCopiedToClipboard(){
+	$('.sticker').click(function(){
+
+		var _this = this
+
+		$(_this).addClass('notify-copied');
+		window.setTimeout(function(){
+			$(_this).removeClass('notify-copied');
+		}, 1200);
+	});
+}
+
 //Show stickers on screen
 function displayStickers(){
 	$.getJSON('stickers.json?nocache=' + (new Date()).getTime(), function(data){
@@ -75,6 +87,7 @@ function displayStickers(){
 		bindFavoriteStickers();
 		loadFavorites();
 		new Clipboard('.sticker');
+		bindNotifyCopiedToClipboard();
 
 	});
 }

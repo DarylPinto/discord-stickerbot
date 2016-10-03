@@ -92,6 +92,7 @@ main
 			bottom: 0
 			width: 100%
 
+//favorite stars
 .sticker:hover .fa-star-o
 	display: inline
 	color: white
@@ -103,6 +104,25 @@ main
 	.fa-star
 		display: inline
 
+//copied to clipboard message
+.sticker::after
+	display: block
+	content: 'Copied to clipboard!'
+	padding-top: 20px
+	padding-bottom: 20px
+	font-family: "Roboto", sans-serif
+	font-size: 20px
+	background-color: #51a951
+	position: absolute
+	color: white
+	bottom: 0
+	pointer-events: none
+	width: 100%
+	opacity: 0
+	transition: .2s
+
+.sticker.notify-copied::after
+	opacity: 1
 
 #open-sticker-dialog-btn
 	background-color: #51a951

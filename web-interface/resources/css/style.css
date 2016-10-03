@@ -140,6 +140,25 @@ main .sticker {
 .sticker.favorited .fa-star {
   display: inline; }
 
+.sticker::after {
+  display: block;
+  content: "Copied to clipboard!";
+  padding-top: 20px;
+  padding-bottom: 20px;
+  font-family: "Roboto", sans-serif;
+  font-size: 20px;
+  background-color: #51a951;
+  position: absolute;
+  color: white;
+  bottom: 0;
+  pointer-events: none;
+  width: 100%;
+  opacity: 0;
+  transition: 0.2s; }
+
+.sticker.notify-copied::after {
+  opacity: 1; }
+
 #open-sticker-dialog-btn {
   background-color: #51a951;
   color: white;
