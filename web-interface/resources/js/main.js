@@ -101,6 +101,7 @@ function bindFavoriteStickers(){
 		var stickerName = $(this).siblings('p').text().replace(/:/g, '');
 		favorites.push(stickerName);
 		createCookie('favorites', JSON.stringify(favorites), 3650);
+		event.stopPropagation();
 	});
 
 	//Remove sticker
@@ -109,6 +110,7 @@ function bindFavoriteStickers(){
 		var stickerName = $(this).siblings('p').text().replace(/:/g, '');
 		removeFromArray(favorites, stickerName);
 		createCookie('favorites', JSON.stringify(favorites), 3650);
+		event.stopPropagation();
 	});
 
 }
