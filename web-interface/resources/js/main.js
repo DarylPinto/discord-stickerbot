@@ -2,6 +2,7 @@ var stickerData;
 var emojiList;
 var stickerElements = [];
 var favorites = [];
+var showingFavoritesOnly = false;
 
 //Get value from querystring paramaters
 //stackoverflow.com/q/901115
@@ -45,8 +46,9 @@ function storeStickers(key, val){
 function bindDynamicSearch(){
 	$('#sticker-search').on('keyup', function(){
 		var filter = this.value.toLowerCase().trim();
+		var selector = (showingFavoritesOnly) ? '.sticker.favorited p' : '.sticker p';
 
-		$('.sticker p').each(function(){
+		$(selector).each(function(){
 			if( this.textContent.indexOf(filter) === -1 ){
 				$(this).closest('.sticker').addClass('hidden');
 			}else{
@@ -62,6 +64,7 @@ function bindNotifyCopiedToClipboard(){
 
 		var _this = this
 
+		$('.sticker').removeClass('notify-copied');
 		$(_this).addClass('notify-copied');
 		window.setTimeout(function(){
 			$(_this).removeClass('notify-copied');
@@ -87,7 +90,7 @@ function displayStickers(){
 		bindFavoriteStickers();
 		loadFavorites();
 		new Clipboard('.sticker');
-		bindNotifyCopiedToClipboard();
+		bindNotifyCopiedToClipboard();	
 
 	});
 }
@@ -96,7 +99,7 @@ function displayStickers(){
 function bindFavoriteStickers(){
 
 	//Add sticker
-	$('.fa-star-o').click(function(){
+	$('.sticker .fa-star-o').click(function(){
 		$(this).closest('.sticker').addClass('favorited');
 		var stickerName = $(this).siblings('p').text().replace(/:/g, '');
 		favorites.push(stickerName);
@@ -105,7 +108,7 @@ function bindFavoriteStickers(){
 	});
 
 	//Remove sticker
-	$('.fa-star').click(function(){
+	$('.sticker .fa-star').click(function(){
 		$(this).closest('.sticker').removeClass('favorited');
 		var stickerName = $(this).siblings('p').text().replace(/:/g, '');
 		removeFromArray(favorites, stickerName);
@@ -125,6 +128,19 @@ function loadFavorites(){
 			$(this).addClass('favorited');
 		}
 	});
+}
+
+function turnFavoritesOnlyOn(){
+	$('.sticker').removeClass('hidden');
+	$('.sticker:not(.favorited)').addClass('hidden');
+	$('#sticker-search').val('');
+	showingFavoritesOnly = true;
+}
+
+function turnFavoritesOnlyOff(){
+	$('.sticker').removeClass('hidden');
+	$('#sticker-search').val('');
+	showingFavoritesOnly = false;
 }
 
 //Prepare imgur image to be stored in stickers JSON file

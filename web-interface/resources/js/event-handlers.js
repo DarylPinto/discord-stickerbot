@@ -45,6 +45,15 @@ $('.close-x').click(function(){
 	liteModal.close();
 });
 
+$('#favorite-toggle').click(function(){
+	$(this).toggleClass('active');
+	if(showingFavoritesOnly){
+		turnFavoritesOnlyOff();
+	}else{
+		turnFavoritesOnlyOn();
+	}
+});
+
 $(document).ready(function(){
 	$('#sticker-search').focus();
 });

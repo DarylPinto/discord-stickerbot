@@ -3,6 +3,7 @@
 
 body
 	background-color: #dedede //Sakurai would be proud
+	font-family: 'Robot', sans-serif
 
 input
 	font-size: 16px
@@ -94,7 +95,7 @@ main
 
 //favorite stars
 .sticker:hover .fa-star-o
-	display: inline
+	display: inline 
 	color: white
 	opacity: 0.3
 
@@ -103,6 +104,34 @@ main
 		display: none
 	.fa-star
 		display: inline
+
+#favorite-toggle
+	display: inline-block
+	padding: 8px
+	background-color: #424242
+	border-radius: 100%
+	width: 33px
+	height: 33px
+	cursor: pointer
+	position: relative
+	text-align: center
+	bottom: -4px
+	position: fixed
+	bottom: 20px
+	z-index: 10
+	right: 20px
+	border: 2px solid #ffffff
+	transition: .3s
+	i
+		font-size: 30px
+		color: #b3b3b3
+		line-height: 33px
+	&:hover
+		background-color: #181d25
+	&.active
+		background-color: #181d25
+		i
+			color: #ffd600
 
 //copied to clipboard message
 .sticker::after
